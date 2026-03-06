@@ -1,0 +1,4 @@
+.layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.layout-body { display: flex; flex: 1; overflow: hidden; }
+.content { flex: 1; overflow-y: auto; background: var(--gray-50); }
+.content-inner { padding: 28px; max-width: 1400px; margin: 0 auto; }

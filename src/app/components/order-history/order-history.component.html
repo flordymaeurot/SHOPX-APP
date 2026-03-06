@@ -1,0 +1,153 @@
+<div class="page-header">
+  <div>
+    <div class="page-tag">03 — History</div>
+    <h2 class="page-title">ORDER HISTORY</h2>
+    <div class="red-rule"></div>
+  </div>
+  <button class="btn btn-primary" (click)="openCreate()">
+    <span class="material-icons">add</span> ADD RECORD
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="header-left">
+      <span class="card-title">HISTORY LOG</span>
+      <span class="count-chip">{{ filtered.length }}</span>
+    </div>
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="search" (input)="onSearch()" />
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="loading">
+    <div class="spinner"></div><p>Loading history...</p>
+  </div>
+
+  <div class="table-wrapper" *ngIf="!loading">
+    <table *ngIf="filtered.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th><th>Order #</th><th>Product</th><th>Customer</th>
+          <th>Qty</th><th>Total</th><th>Status</th><th>Order Date</th><th>Delivered</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of filtered">
+          <td class="font-mono id-cell">{{ h.id }}</td>
+          <td class="font-mono" style="color:var(--red);font-weight:700">#{{ h.orderId }}</td>
+          <td><strong>{{ h.productName }}</strong></td>
+          <td>
+            <div style="font-weight:600">{{ h.customerName }}</div>
+            <div style="font-size:11px;color:var(--gray-500)">{{ h.address }}</div>
+          </td>
+          <td class="text-center">{{ h.quantity }}</td>
+          <td class="total-cell">₱{{ h.total | number:'1.2-2' }}</td>
+          <td><span class="badge" [ngClass]="statusClass(h.status)">{{ h.status }}</span></td>
+          <td class="font-mono" style="font-size:11px;color:var(--gray-500)">{{ h.orderDate }}</td>
+          <td class="font-mono" style="font-size:11px;color:var(--gray-500)">
+            {{ h.deliveredDate || '—' }}
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-sm btn-outline" (click)="openEdit(h)">
+                <span class="material-icons" style="font-size:14px">edit</span> EDIT
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="confirmDelete(h.id!)">
+                <span class="material-icons" style="font-size:14px">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="empty-state" *ngIf="filtered.length === 0 && !loading">
+      <span class="material-icons">history</span>
+      <h3>No Records Found</h3>
+      <p>{{ search ? 'Try a different keyword.' : 'No order history yet.' }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" style="max-width:600px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ isEditing ? 'EDIT RECORD' : 'ADD RECORD' }}</span>
+      <button class="btn btn-icon" style="border-color:#333;color:white;box-shadow:none" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="modalError">{{ modalError }}</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Order ID</label>
+          <input type="number" class="form-control" [(ngModel)]="form.orderId" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" [(ngModel)]="form.status">
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" class="form-control" [(ngModel)]="form.productName" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" [(ngModel)]="form.quantity" min="1" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total (₱)</label>
+        <input type="number" class="form-control" [(ngModel)]="form.total" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Customer Name *</label>
+        <input type="text" class="form-control" [(ngModel)]="form.customerName" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" [(ngModel)]="form.address"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Order Date</label>
+          <input type="date" class="form-control" [(ngModel)]="form.orderDate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Delivered Date</label>
+          <input type="date" class="form-control" [(ngModel)]="form.deliveredDate" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeModal()">CANCEL</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        <span class="btn-loader" *ngIf="saving"></span>
+        {{ saving ? 'SAVING...' : (isEditing ? 'SAVE CHANGES' : 'ADD RECORD') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header" style="background:var(--red);border-color:var(--red)">
+      <span class="modal-title">DELETE RECORD</span>
+    </div>
+    <div class="modal-body"><p style="font-weight:600">Are you sure? This action cannot be undone.</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="cancelDelete()">CANCEL</button>
+      <button class="btn btn-danger" (click)="doDelete()">
+        <span class="material-icons" style="font-size:16px">delete</span> DELETE
+      </button>
+    </div>
+  </div>
+</div>

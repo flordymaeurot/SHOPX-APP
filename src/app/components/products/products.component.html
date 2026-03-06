@@ -1,0 +1,142 @@
+<div class="page-header">
+  <div>
+    <div class="page-tag">01 — Inventory</div>
+    <h2 class="page-title">PRODUCTS</h2>
+    <div class="red-rule"></div>
+  </div>
+  <button class="btn btn-primary" (click)="openCreate()">
+    <span class="material-icons">add</span> ADD PRODUCT
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="header-left">
+      <span class="card-title">ALL PRODUCTS</span>
+      <span class="count-chip">{{ filtered.length }}</span>
+    </div>
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="search" (input)="onSearch()" />
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading products...</p>
+  </div>
+
+  <div class="table-wrapper" *ngIf="!loading">
+    <table *ngIf="filtered.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of filtered">
+          <td class="font-mono id-cell">{{ p.id }}</td>
+          <td><strong>{{ p.name }}</strong></td>
+          <td><span class="badge badge-black">{{ p.category }}</span></td>
+          <td class="price-cell">₱{{ p.price | number:'1.2-2' }}</td>
+          <td><span class="badge" [ngClass]="stockClass(p.stock)">{{ p.stock }} units</span></td>
+          <td class="desc-cell">{{ p.description }}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-sm btn-outline" (click)="openEdit(p)">
+                <span class="material-icons" style="font-size:14px">edit</span> EDIT
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="confirmDelete(p.id!)">
+                <span class="material-icons" style="font-size:14px">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="filtered.length === 0 && !loading">
+      <span class="material-icons">inventory_2</span>
+      <h3>No Products Found</h3>
+      <p>{{ search ? 'Try a different keyword.' : 'Add your first product to get started.' }}</p>
+      <button class="btn btn-primary" (click)="openCreate()" *ngIf="!search">ADD PRODUCT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ isEditing ? 'EDIT PRODUCT' : 'NEW PRODUCT' }}</span>
+      <button class="btn btn-icon" style="border-color:#333;color:white;box-shadow:none" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="modalError">{{ modalError }}</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" class="form-control" [(ngModel)]="form.name" placeholder="e.g. Wireless Mouse" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-control" [(ngModel)]="form.category">
+            <option value="">Select...</option>
+            <option>Electronics</option>
+            <option>Accessories</option>
+            <option>Clothing</option>
+            <option>Food</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (₱)</label>
+          <input type="number" class="form-control" [(ngModel)]="form.price" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock</label>
+          <input type="number" class="form-control" [(ngModel)]="form.stock" min="0" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" [(ngModel)]="form.description" placeholder="Product details..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeModal()">CANCEL</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        <span class="btn-loader" *ngIf="saving"></span>
+        {{ saving ? 'SAVING...' : (isEditing ? 'SAVE CHANGES' : 'ADD PRODUCT') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header" style="background:var(--red);border-color:var(--red)">
+      <span class="modal-title">DELETE PRODUCT</span>
+    </div>
+    <div class="modal-body">
+      <p style="font-weight:600">Are you sure? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="cancelDelete()">CANCEL</button>
+      <button class="btn btn-danger" (click)="doDelete()">
+        <span class="material-icons" style="font-size:16px">delete</span> DELETE
+      </button>
+    </div>
+  </div>
+</div>

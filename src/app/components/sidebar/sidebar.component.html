@@ -1,0 +1,34 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-inner">
+
+    <div class="sidebar-section-label" *ngIf="!collapsed">NAVIGATION</div>
+
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let item of menuItems"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="item.label"
+      >
+        <span class="nav-code" *ngIf="!collapsed">{{ item.code }}</span>
+        <span class="material-icons nav-icon">{{ item.icon }}</span>
+        <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom" *ngIf="!collapsed">
+      <div class="server-status">
+        <div class="status-row">
+          <span class="status-key">API SERVER</span>
+          <span class="status-val">:3000</span>
+        </div>
+        <div class="status-row">
+          <span class="status-key">STATUS</span>
+          <span class="status-val running">RUNNING</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</aside>

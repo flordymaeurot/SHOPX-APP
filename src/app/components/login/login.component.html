@@ -1,0 +1,107 @@
+<div class="login-root">
+
+  <!-- LEFT: Giant typographic panel -->
+  <div class="login-left">
+    <div class="left-inner">
+      <div class="logo-row">
+        <div class="logo-mark">X</div>
+        <span class="logo-text">SHOPX</span>
+      </div>
+
+      <div class="hero-block">
+        <div class="hero-label">Management System</div>
+        <h1 class="hero-title">SELL.<br>TRACK.<br>GROW.</h1>
+        <div class="red-bar"></div>
+        <p class="hero-desc">
+          A bold, no-nonsense platform for managing your products, orders, and history — all in one place.
+        </p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feat-item">
+          <span class="feat-num">01</span>
+          <span class="feat-label">Product Management</span>
+        </div>
+        <div class="feat-item">
+          <span class="feat-num">02</span>
+          <span class="feat-label">Order Tracking</span>
+        </div>
+        <div class="feat-item">
+          <span class="feat-num">03</span>
+          <span class="feat-label">Order History</span>
+        </div>
+      </div>
+
+      <div class="left-footer">© 2024 SHOPX SYSTEM</div>
+    </div>
+
+    <!-- Diagonal decorative stripe -->
+    <div class="diagonal-stripe"></div>
+  </div>
+
+  <!-- RIGHT: Login form -->
+  <div class="login-right">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-tag">SECURE LOGIN</div>
+        <h2 class="form-title">SIGN IN</h2>
+        <div class="red-bar short"></div>
+      </div>
+
+      <div class="alert alert-error" *ngIf="error">
+        <span class="material-icons" style="font-size:16px">error</span>
+        {{ error }}
+      </div>
+
+      <form (ngSubmit)="onLogin()" #f="ngForm" class="login-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-wrap">
+            <span class="material-icons input-ico">person</span>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="username"
+              name="username"
+              placeholder="Enter username"
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <span class="material-icons input-ico">lock</span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              class="form-control"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter password"
+              autocomplete="current-password"
+            />
+            <button type="button" class="eye-btn" (click)="showPassword = !showPassword">
+              <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cred-hint">
+          <span class="material-icons" style="font-size:14px;color:var(--red)">info</span>
+          Default — username: <strong>admin</strong> &nbsp;/&nbsp; password: <strong>admin123</strong>
+        </div>
+
+        <button type="submit" class="btn btn-primary login-btn" [disabled]="loading">
+          <span class="btn-loader" *ngIf="loading"></span>
+          <span class="material-icons" *ngIf="!loading">arrow_forward</span>
+          {{ loading ? 'AUTHENTICATING...' : 'SIGN IN' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Corner decoration -->
+    <div class="corner-mark">SYS v1.0</div>
+  </div>
+
+</div>

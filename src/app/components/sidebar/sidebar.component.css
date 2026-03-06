@@ -1,0 +1,106 @@
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--black);
+  border-right: 3px solid var(--red);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.sidebar.collapsed { width: 60px; }
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 0;
+}
+
+.sidebar-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #444;
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 10px;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  text-decoration: none;
+  color: #666;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: var(--transition);
+  position: relative;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.nav-item:hover {
+  color: var(--white);
+  background: #111;
+  border-color: #333;
+}
+.nav-item.active {
+  color: var(--white);
+  background: var(--red);
+  border-color: var(--red);
+}
+.nav-item.active .nav-code { color: rgba(255,255,255,0.6); }
+.nav-item.active .nav-icon { color: var(--white); }
+
+.nav-code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #444;
+  min-width: 18px;
+  transition: var(--transition);
+}
+.nav-icon { font-size: 18px; flex-shrink: 0; }
+.nav-label { flex: 1; }
+
+.sidebar-bottom {
+  padding: 16px 10px 0;
+  border-top: 1px solid #1a1a1a;
+  margin-top: 16px;
+}
+
+.server-status {
+  background: #111;
+  border: 1px solid #222;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status-key {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #444;
+  text-transform: uppercase;
+}
+.status-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #666;
+}
+.status-val.running { color: var(--red); font-weight: 700; }

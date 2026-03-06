@@ -1,0 +1,44 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="menu-btn" (click)="toggleSidebar.emit()">
+      <span class="material-icons">menu</span>
+    </button>
+    <div class="brand">
+      <div class="brand-x">X</div>
+      <span class="brand-name">SHOPX</span>
+    </div>
+    <div class="topbar-divider"></div>
+    <span class="topbar-sub">Management System</span>
+  </div>
+
+  <div class="topbar-right">
+    <div class="status-dot">
+      <span class="dot-live"></span>
+      <span class="dot-label">LIVE</span>
+    </div>
+
+    <div class="user-chip" (click)="showDropdown = !showDropdown">
+      <div class="user-avatar">{{ getInitials() }}</div>
+      <div class="user-meta">
+        <span class="user-name">{{ currentUser?.name }}</span>
+        <span class="user-role">Administrator</span>
+      </div>
+      <span class="material-icons caret" [class.open]="showDropdown">expand_more</span>
+
+      <div class="user-dropdown" *ngIf="showDropdown">
+        <div class="dropdown-top">
+          <div class="user-avatar lg">{{ getInitials() }}</div>
+          <div>
+            <div class="dd-name">{{ currentUser?.name }}</div>
+            <div class="dd-email">{{ currentUser?.email }}</div>
+          </div>
+        </div>
+        <div class="dd-divider"></div>
+        <button class="dd-item logout" (click)="logout()">
+          <span class="material-icons">logout</span>
+          SIGN OUT
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

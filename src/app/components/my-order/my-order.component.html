@@ -1,0 +1,145 @@
+<div class="page-header">
+  <div>
+    <div class="page-tag">02 — Orders</div>
+    <h2 class="page-title">MY ORDERS</h2>
+    <div class="red-rule"></div>
+  </div>
+  <button class="btn btn-primary" (click)="openCreate()">
+    <span class="material-icons">add</span> NEW ORDER
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="header-left">
+      <span class="card-title">ORDER LIST</span>
+      <span class="count-chip">{{ filtered.length }}</span>
+    </div>
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="search" (input)="onSearch()" />
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="loading">
+    <div class="spinner"></div><p>Loading orders...</p>
+  </div>
+
+  <div class="table-wrapper" *ngIf="!loading">
+    <table *ngIf="filtered.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th><th>Product</th><th>Customer</th><th>Qty</th>
+          <th>Price</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let o of filtered">
+          <td class="font-mono id-cell">{{ o.id }}</td>
+          <td><strong>{{ o.productName }}</strong></td>
+          <td>
+            <div style="font-weight:600">{{ o.customerName }}</div>
+            <div style="font-size:11px;color:var(--gray-500)">{{ o.address }}</div>
+          </td>
+          <td class="text-center">{{ o.quantity }}</td>
+          <td class="price-cell">₱{{ o.price | number:'1.2-2' }}</td>
+          <td class="total-cell">₱{{ o.total | number:'1.2-2' }}</td>
+          <td><span class="badge" [ngClass]="statusClass(o.status)">{{ o.status }}</span></td>
+          <td class="font-mono" style="font-size:11px;color:var(--gray-500)">{{ o.orderDate }}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-sm btn-outline" (click)="openEdit(o)">
+                <span class="material-icons" style="font-size:14px">edit</span> EDIT
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="confirmDelete(o.id!)">
+                <span class="material-icons" style="font-size:14px">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="empty-state" *ngIf="filtered.length === 0 && !loading">
+      <span class="material-icons">receipt_long</span>
+      <h3>No Orders Found</h3>
+      <p>{{ search ? 'Try a different keyword.' : 'Create your first order.' }}</p>
+      <button class="btn btn-primary" (click)="openCreate()" *ngIf="!search">NEW ORDER</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" style="max-width:600px" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ isEditing ? 'EDIT ORDER' : 'NEW ORDER' }}</span>
+      <button class="btn btn-icon" style="border-color:#333;color:white;box-shadow:none" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="modalError">{{ modalError }}</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" class="form-control" [(ngModel)]="form.productName" placeholder="Product name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" [(ngModel)]="form.status">
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" [(ngModel)]="form.quantity" (input)="computeTotal()" min="1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit Price (₱)</label>
+          <input type="number" class="form-control" [(ngModel)]="form.price" (input)="computeTotal()" min="0" step="0.01" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total (Auto)</label>
+        <input type="number" class="form-control" [value]="form.total" readonly style="background:var(--gray-50);cursor:not-allowed" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Customer Name *</label>
+        <input type="text" class="form-control" [(ngModel)]="form.customerName" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" [(ngModel)]="form.address"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Order Date</label>
+        <input type="date" class="form-control" [(ngModel)]="form.orderDate" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeModal()">CANCEL</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        <span class="btn-loader" *ngIf="saving"></span>
+        {{ saving ? 'SAVING...' : (isEditing ? 'SAVE CHANGES' : 'CREATE ORDER') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header" style="background:var(--red);border-color:var(--red)">
+      <span class="modal-title">DELETE ORDER</span>
+    </div>
+    <div class="modal-body"><p style="font-weight:600">Are you sure? This action cannot be undone.</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="cancelDelete()">CANCEL</button>
+      <button class="btn btn-danger" (click)="doDelete()">
+        <span class="material-icons" style="font-size:16px">delete</span> DELETE
+      </button>
+    </div>
+  </div>
+</div>

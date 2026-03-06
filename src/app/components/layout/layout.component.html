@@ -1,0 +1,11 @@
+<div class="layout">
+  <app-topbar (toggleSidebar)="toggleSidebar()"></app-topbar>
+  <div class="layout-body">
+    <app-sidebar [collapsed]="sidebarCollapsed"></app-sidebar>
+    <main class="content">
+      <div class="content-inner">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
